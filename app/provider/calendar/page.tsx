@@ -383,7 +383,7 @@ export default function ProviderCalendar() {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     
-    const weekDays = [];
+    const weekDays: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + i);

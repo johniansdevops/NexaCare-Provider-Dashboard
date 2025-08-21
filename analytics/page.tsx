@@ -11,7 +11,7 @@ import {
   CurrencyDollarIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon,
   EyeIcon,
   SparklesIcon,
   ExclamationTriangleIcon,
@@ -374,7 +374,7 @@ export default function ProviderAnalytics() {
 
   const getInsightIcon = (type: string) => {
     switch (type) {
-      case 'prediction': return BrainIcon;
+      case 'prediction': return CpuChipIcon;
       case 'recommendation': return BoltIcon;
       case 'alert': return ExclamationTriangleIcon;
       case 'opportunity': return ArrowTrendingUpIcon;

@@ -8,7 +8,7 @@ import {
   ShieldCheckIcon,
   BeakerIcon,
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon,
   EyeIcon,
   DocumentTextIcon,
   ClockIcon,
@@ -358,7 +358,7 @@ export default function ClinicalDecisionSupport() {
       case 'drug_interaction':
         return BeakerIcon;
       case 'diagnosis_suggestion':
-        return BrainIcon;
+        return CpuChipIcon;
       case 'risk_warning':
         return ExclamationTriangleIcon;
       case 'protocol_reminder':
@@ -434,7 +434,7 @@ export default function ClinicalDecisionSupport() {
         <div className="card p-4">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-orange-500/20 rounded-lg">
-              <BrainIcon className="w-6 h-6 text-orange-400" />
+              <CpuChipIcon className="w-6 h-6 text-orange-400" />
             </div>
             <div>
               <p className="text-sm text-gray-400">AI Suggestions</p>

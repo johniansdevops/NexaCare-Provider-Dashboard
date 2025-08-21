@@ -156,6 +156,12 @@ export default function ProviderPatients() {
           message: 'INR results pending review',
           urgency: 'medium'
         }
+      ],
+      labResults: [
+        { id: '1', type: 'INR Test', date: '2024-01-08', status: 'abnormal', fileName: 'inr_test_2024_01_08.pdf' }
+      ],
+      clinicalNotes: [
+        { id: '1', date: '2024-01-08', provider: 'Dr. Johnson', type: 'visit', content: 'Atrial fibrillation management reviewed. INR monitoring needed.' }
       ]
     },
     {
@@ -179,7 +185,13 @@ export default function ProviderPatients() {
         weight: 135,
         lastUpdated: '2024-01-05'
       },
-      alerts: []
+      alerts: [],
+      labResults: [
+        { id: '1', type: 'Allergy Panel', date: '2024-01-05', status: 'normal', fileName: 'allergy_panel_2024_01_05.pdf' }
+      ],
+      clinicalNotes: [
+        { id: '1', date: '2024-01-05', provider: 'Dr. Davis', type: 'visit', content: 'Routine asthma check-up. Symptoms well controlled with current medication.' }
+      ]
     },
     {
       id: '4',
@@ -212,6 +224,12 @@ export default function ProviderPatients() {
           message: 'Missed last two appointments',
           urgency: 'high'
         }
+      ],
+      labResults: [
+        { id: '1', type: 'Comprehensive Panel', date: '2024-01-12', status: 'critical', fileName: 'comprehensive_panel_2024_01_12.pdf' }
+      ],
+      clinicalNotes: [
+        { id: '1', date: '2024-01-12', provider: 'Dr. Miller', type: 'visit', content: 'Patient showing signs of severe depression. Pain management protocol needs review.' }
       ]
     },
     {
@@ -241,6 +259,12 @@ export default function ProviderPatients() {
           message: 'New prescription ready for pickup',
           urgency: 'low'
         }
+      ],
+      labResults: [
+        { id: '1', type: 'Neurological Panel', date: '2024-01-09', status: 'normal', fileName: 'neurological_panel_2024_01_09.pdf' }
+      ],
+      clinicalNotes: [
+        { id: '1', date: '2024-01-09', provider: 'Dr. Garcia', type: 'visit', content: 'Migraine frequency has decreased with new medication. Anxiety levels stable.' }
       ]
     }
   ];

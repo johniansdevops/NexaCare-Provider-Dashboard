@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   SparklesIcon,
@@ -15,7 +15,7 @@ import {
   ArrowUpIcon,
   ChatBubbleLeftRightIcon,
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon,
   EyeIcon,
   ScissorsIcon,
   BoltIcon,
