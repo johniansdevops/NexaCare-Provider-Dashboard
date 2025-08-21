@@ -25,6 +25,8 @@ import {
   BoltIcon,
   FireIcon,
   ShieldCheckIcon,
+  CheckCircleIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import { formatDateTime, cn } from '@/lib/utils';
 
@@ -39,6 +41,7 @@ interface Appointment {
   priority: 'normal' | 'urgent';
   duration: number;
   avatar: string;
+  specialty: string;
 }
 
 interface PatientAlert {
@@ -74,6 +77,7 @@ export default function ProviderDashboard() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [practiceScore] = useState(92); // Practice efficiency score
 
   // Mock data - replace with real API calls
   const todayAppointments: Appointment[] = [
@@ -87,7 +91,8 @@ export default function ProviderDashboard() {
       status: 'completed',
       priority: 'normal',
       duration: 30,
-      avatar: '👩‍💼'
+      avatar: '👩‍💼',
+      specialty: 'Primary Care'
     },
     {
       id: '2',
@@ -99,7 +104,8 @@ export default function ProviderDashboard() {
       status: 'in_progress',
       priority: 'normal',
       duration: 20,
-      avatar: '👨‍💻'
+      avatar: '👨‍💻',
+      specialty: 'Cardiology'
     },
     {
       id: '3',
@@ -111,7 +117,8 @@ export default function ProviderDashboard() {
       status: 'scheduled',
       priority: 'urgent',
       duration: 45,
-      avatar: '👩‍🎨'
+      avatar: '👩‍🎨',
+      specialty: 'Emergency'
     },
     {
       id: '4',
@@ -123,7 +130,8 @@ export default function ProviderDashboard() {
       status: 'scheduled',
       priority: 'normal',
       duration: 15,
-      avatar: '👨‍🔬'
+      avatar: '👨‍🔬',
+      specialty: 'Internal Medicine'
     },
   ];
 
@@ -178,6 +186,7 @@ export default function ProviderDashboard() {
       id: '1',
       title: 'High-Risk Patient Alert',
       message: 'Emily Rodriguez shows elevated cardiac markers. Consider immediate ECG and troponin levels for comprehensive evaluation.',
+      type: 'alert',
       priority: 'high',
       patientId: 'PT003',
       time: '30 minutes ago',
@@ -187,6 +196,7 @@ export default function ProviderDashboard() {
       id: '2',
       title: 'Drug Interaction Warning',
       message: 'Potential interaction detected between prescribed Warfarin and new Amoxicillin for Michael Chen.',
+      type: 'reminder',
       priority: 'medium',
       patientId: 'PT002',
       time: '1 hour ago',
@@ -196,6 +206,7 @@ export default function ProviderDashboard() {
       id: '3',
       title: 'Preventive Care Opportunity',
       message: '12 patients are due for annual mammograms. Automated reminders can improve compliance rates.',
+      type: 'positive',
       priority: 'low',
       patientId: null,
       time: '2 hours ago',
@@ -233,13 +244,6 @@ export default function ProviderDashboard() {
       href: '/provider/notes',
       icon: ClipboardDocumentListIcon,
       color: 'bg-purple-500/20 border border-purple-500/30'
-    },
-    {
-      title: 'Practice Analytics',
-      description: 'Review performance insights',
-      href: '/provider/analytics',
-      icon: ChartBarIcon,
-      color: 'bg-orange-500/20 border border-orange-500/30'
     },
   ];
 
@@ -292,6 +296,13 @@ export default function ProviderDashboard() {
     }
   };
 
+  const getPracticeScoreColor = (score: number): string => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 80) return 'text-blue-600';
+    if (score >= 70) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
   if (loading) {
     return (
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-white min-h-screen animate-fade-in">
@@ -337,6 +348,64 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
+      {/* Practice Efficiency Score */}
+      <div className="card-white p-8 border-2 border-purple-200 animate-slide-up" style={{background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.05), rgba(59, 130, 246, 0.05))'}}>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Practice Efficiency Score</h3>
+            <p className="text-gray-600">AI-generated based on patient flow, satisfaction, and outcomes</p>
+          </div>
+          <div className="text-right">
+            <div className={`text-5xl font-bold ${getPracticeScoreColor(practiceScore)} mb-2`}>
+              {practiceScore}
+            </div>
+            <div className="flex items-center justify-end text-green-600 text-sm">
+              <ArrowTrendingUpIcon className="w-4 h-4 mr-1" />
+              +4 this week
+            </div>
+          </div>
+        </div>
+        
+        <div className="relative mb-4">
+          <div className="bg-gray-200 rounded-full h-3">
+            <div 
+              className="h-3 rounded-full mediva-gradient transition-all duration-1000 ease-out"
+              style={{ width: `${practiceScore}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-500 font-mono">Performance Trend</span>
+          <span className="text-green-600 font-medium">Excellent 🌟</span>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
+        {quickActions.map((action) => (
+          <Link
+            key={action.title}
+            href={action.href}
+            className="card-white-interactive p-6 text-center group"
+          >
+            {typeof action.icon === 'string' ? (
+              <div className="flex items-center justify-center mb-4">
+                <span className="text-4xl text-purple-500 font-bold group-hover:scale-110 transition-transform duration-200">
+                  {action.icon}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center mb-4">
+                <action.icon className="w-8 h-8 text-purple-500 group-hover:scale-110 transition-transform duration-200" />
+              </div>
+            )}
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h4>
+            <p className="text-sm text-gray-600">{action.description}</p>
+          </Link>
+        ))}
+      </div>
+
       {/* Practice Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
         {practiceMetrics.map((metric) => (
@@ -361,31 +430,6 @@ export default function ProviderDashboard() {
               </span>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
-        {quickActions.slice(0, 4).map((action) => (
-          <Link
-            key={action.title}
-            href={action.href}
-            className="card-white-interactive p-6 text-center group"
-          >
-            {typeof action.icon === 'string' ? (
-              <div className="flex items-center justify-center mb-4">
-                <span className="text-4xl text-purple-500 font-bold group-hover:scale-110 transition-transform duration-200">
-                  {action.icon}
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center mb-4">
-                <action.icon className="w-8 h-8 text-purple-500 group-hover:scale-110 transition-transform duration-200" />
-              </div>
-            )}
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h4>
-            <p className="text-sm text-gray-600">{action.description}</p>
-          </Link>
         ))}
       </div>
 
@@ -419,8 +463,9 @@ export default function ProviderDashboard() {
                             <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{appointment.reason}</p>
-                        <div className="flex items-center space-x-3 text-xs text-gray-500">
+                        <p className="text-sm text-gray-600 mb-1">{appointment.reason}</p>
+                        <p className="text-xs text-gray-500">{appointment.specialty}</p>
+                        <div className="flex items-center space-x-3 text-xs text-gray-500 mt-2">
                           <span className="font-mono">{formatDateTime(appointment.time)}</span>
                           <div className="flex items-center space-x-1">
                             <Icon className="w-3 h-3" />
@@ -491,7 +536,7 @@ export default function ProviderDashboard() {
           </div>
           <Link href="/provider/ai-chat" className="btn-primary">
             <BoltIcon className="w-4 h-4 mr-2" />
-            Open AI Assistant
+            Chat with AI
           </Link>
         </div>
         
@@ -500,9 +545,9 @@ export default function ProviderDashboard() {
             <div key={insight.id} className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
               <div className="flex items-start space-x-3 mb-3">
                 <div className={`w-3 h-3 rounded-full mt-2 ${
-                  insight.priority === 'high' ? 'bg-red-400' : 
-                  insight.priority === 'medium' ? 'bg-yellow-400' : 
-                  'bg-blue-400'
+                  insight.type === 'positive' ? 'bg-green-400' : 
+                  insight.type === 'reminder' ? 'bg-blue-400' : 
+                  insight.type === 'assessment' ? 'bg-yellow-400' : 'bg-purple-400'
                 }`}></div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 mb-2">{insight.title}</h4>
@@ -520,12 +565,12 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
-      {/* Additional Quick Action */}
+      {/* Additional Actions */}
       <div className="card-white p-6 animate-slide-up">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <HeartIcon className="w-6 h-6 text-purple-500" />
-            <h3 className="text-xl font-semibold text-gray-900">More Actions</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Additional Actions</h3>
           </div>
         </div>
         
@@ -533,25 +578,25 @@ export default function ProviderDashboard() {
           <Link href="/provider/real-time-monitoring" className="p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors group">
             <HeartIcon className="w-6 h-6 text-red-500 mb-2 group-hover:scale-110 transition-transform" />
             <h4 className="font-semibold text-gray-900 text-sm">Patient Monitoring</h4>
-            <p className="text-xs text-gray-600">Real-time vitals</p>
+            <p className="text-xs text-gray-600">Real-time vitals & alerts</p>
           </Link>
           
           <Link href="/provider/clinical-decision-support" className="p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group">
             <BeakerIcon className="w-6 h-6 text-green-500 mb-2 group-hover:scale-110 transition-transform" />
             <h4 className="font-semibold text-gray-900 text-sm">Clinical Support</h4>
-            <p className="text-xs text-gray-600">Decision tools</p>
+            <p className="text-xs text-gray-600">Decision tools & guidelines</p>
           </Link>
           
           <Link href="/provider/documents" className="p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group">
             <DocumentTextIcon className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-            <h4 className="font-semibold text-gray-900 text-sm">Documents</h4>
-            <p className="text-xs text-gray-600">Medical records</p>
+            <h4 className="font-semibold text-gray-900 text-sm">Medical Records</h4>
+            <p className="text-xs text-gray-600">Patient documents & files</p>
           </Link>
           
           <button className="p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group text-left">
             <PlusIcon className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-            <h4 className="font-semibold text-gray-900 text-sm">Add Patient</h4>
-            <p className="text-xs text-gray-600">Register new</p>
+            <h4 className="font-semibold text-gray-900 text-sm">Add New Patient</h4>
+            <p className="text-xs text-gray-600">Register & onboard</p>
           </button>
         </div>
       </div>

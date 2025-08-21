@@ -17,92 +17,29 @@ import {
   ChatBubbleLeftRightIcon,
   Bars3Icon,
   XMarkIcon,
+  SquaresPlusIcon,
+  CalendarDaysIcon,
+  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
-interface SidebarItem {
-  id: string;
-  icon: React.ComponentType<{ className?: string }> | string;
+interface NavigationItem {
+  name: string;
   href: string;
-  label: string;
-  gradient?: string;
+  icon: React.ComponentType<{ className?: string }> | string;
   isAI?: boolean;
 }
 
-const sidebarItems: SidebarItem[] = [
-  {
-    id: 'dashboard',
-    icon: HomeIcon,
-    href: '/provider',
-    label: 'Dashboard',
-    gradient: 'icon-gradient-blue'
-  },
-  {
-    id: 'calendar',
-    icon: CalendarIcon,
-    href: '/provider/calendar',
-    label: 'Calendar',
-  },
-  {
-    id: 'monitoring',
-    icon: HeartIcon,
-    href: '/provider/real-time-monitoring',
-    label: 'Real-Time Monitoring',
-    gradient: 'icon-gradient-red'
-  },
-  {
-    id: 'patients',
-    icon: UserGroupIcon,
-    href: '/provider/patients',
-    label: 'Patients',
-  },
-  {
-    id: 'ai-chat',
-    icon: '✦',
-    href: '/provider/ai-chat',
-    label: 'AI Assistant',
-    isAI: true
-  },
-  {
-    id: 'analytics',
-    icon: ChartBarIcon,
-    href: '/provider/analytics',
-    label: 'Analytics',
-    gradient: 'icon-gradient-green'
-  },
-  {
-    id: 'clinical',
-    icon: BeakerIcon,
-    href: '/provider/clinical-decision-support',
-    label: 'Clinical Support',
-  },
-  {
-    id: 'documents',
-    icon: DocumentTextIcon,
-    href: '/provider/documents',
-    label: 'Documents',
-  },
-  {
-    id: 'notes',
-    icon: ClipboardDocumentListIcon,
-    href: '/provider/notes',
-    label: 'Clinical Notes',
-  },
-];
-
-const bottomItems: SidebarItem[] = [
-  {
-    id: 'settings',
-    icon: Cog6ToothIcon,
-    href: '/provider/settings',
-    label: 'Settings',
-  },
-  {
-    id: 'help',
-    icon: QuestionMarkCircleIcon,
-    href: '/provider/help',
-    label: 'Help',
-  },
+const providerNavigation: NavigationItem[] = [
+  { name: 'Dashboard', href: '/provider', icon: SquaresPlusIcon },
+  { name: 'AI Clinical Assistant', href: '/provider/ai-chat', icon: '✦', isAI: true },
+  { name: 'Patients', href: '/provider/patients', icon: UserGroupIcon },
+  { name: 'Schedule', href: '/provider/calendar', icon: CalendarIcon },
+  { name: 'Monitoring', href: '/provider/real-time-monitoring', icon: HeartIcon },
+  { name: 'Clinical Support', href: '/provider/clinical-decision-support', icon: BeakerIcon },
+  { name: 'Analytics', href: '/provider/analytics', icon: ChartBarIcon },
+  { name: 'Documents', href: '/provider/documents', icon: DocumentTextIcon },
+  { name: 'Clinical Notes', href: '/provider/notes', icon: ClipboardDocumentListIcon },
 ];
 
 interface GlobalSidebarProps {
@@ -113,16 +50,12 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const isActive = (href: string) => {
-    if (href === '/provider') {
-      return pathname === '/provider';
-    }
-    return pathname?.startsWith(href);
-  };
+  // Use provider navigation
+  const navigation = providerNavigation;
 
   // Mock user data - in real app this would come from auth context
   const user = {
-    full_name: 'Dr. Smith',
+    full_name: 'Dr. Sarah Smith',
     role: 'provider'
   };
 
@@ -157,17 +90,17 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
             </button>
           </div>
           <nav className="p-4 space-y-1">
-            {sidebarItems.map((item) => {
-              const isActiveItem = isActive(item.href);
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
               const Icon = typeof item.icon === 'string' ? null : item.icon;
               
               return (
                 <Link
-                  key={item.id}
+                  key={item.name}
                   href={item.href}
                   className={cn(
                     "flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                    isActiveItem
+                    isActive
                       ? "bg-gradient-to-r from-pink-50 to-purple-50 text-gray-900 border border-pink-200 shadow-sm"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   )}
@@ -176,7 +109,7 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
                   {item.isAI ? (
                     <span className={cn(
                       "text-lg font-bold transition-all duration-200",
-                      isActiveItem 
+                      isActive 
                         ? "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent filter drop-shadow-sm" 
                         : "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent opacity-70 hover:opacity-100"
                     )}>
@@ -185,13 +118,13 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
                   ) : Icon ? (
                     <Icon className={cn(
                       "w-6 h-6 transition-all duration-200",
-                      isActiveItem
+                      isActive
                         ? "text-purple-600 filter drop-shadow-sm"
                         : "text-gray-500 group-hover:text-purple-600"
                     )} />
                   ) : null}
-                  <span className={item.isAI && !isActiveItem ? "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent" : ""}>
-                    {item.label}
+                  <span className={item.isAI && !isActive ? "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent" : ""}>
+                    {item.name}
                   </span>
                 </Link>
               );
@@ -212,26 +145,26 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
 
           {/* Navigation Icons */}
           <nav className="flex-1 flex flex-col items-center py-4 space-y-2">
-            {sidebarItems.map((item) => {
-              const isActiveItem = isActive(item.href);
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
               const Icon = typeof item.icon === 'string' ? null : item.icon;
               
               return (
                 <Link
-                  key={item.id}
+                  key={item.name}
                   href={item.href}
                   className={cn(
                     "w-12 h-12 flex items-center justify-center transition-all duration-200 group relative rounded-xl",
-                    isActiveItem
+                    isActive
                       ? "bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-200 shadow-sm"
                       : "hover:bg-gray-50 hover:border hover:border-gray-200"
                   )}
-                  title={item.label}
+                  title={item.name}
                 >
                   {item.isAI ? (
                     <span className={cn(
                       "text-xl font-bold transition-all duration-200",
-                      isActiveItem 
+                      isActive 
                         ? "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent filter drop-shadow-lg animate-pulse"
                         : "bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent opacity-70 hover:opacity-100 hover:filter hover:drop-shadow-md"
                     )}>
@@ -240,7 +173,7 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
                   ) : Icon ? (
                     <Icon className={cn(
                       "w-6 h-6 transition-all duration-200",
-                      isActiveItem 
+                      isActive 
                         ? "text-purple-600 filter drop-shadow-sm"
                         : "text-gray-500 group-hover:text-purple-600 group-hover:filter group-hover:drop-shadow-sm"
                     )} />
@@ -248,7 +181,7 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
                   
                   {/* Enhanced Tooltip */}
                   <div className="absolute left-full ml-3 px-3 py-2 bg-white text-gray-900 text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-200 shadow-lg">
-                    {item.label}
+                    {item.name}
                     <div className="absolute top-1/2 left-0 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-white transform -translate-y-1/2 -translate-x-full"></div>
                   </div>
                 </Link>
@@ -258,37 +191,31 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
 
           {/* Bottom Icons */}
           <div className="flex flex-col items-center py-4 space-y-2 border-t border-gray-100">
-            {bottomItems.map((item) => {
-              const isActiveItem = isActive(item.href);
-              const Icon = item.icon;
-              
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    "w-12 h-12 flex items-center justify-center transition-all duration-200 group relative rounded-xl",
-                    isActiveItem
-                      ? "bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-200 shadow-sm"
-                      : "hover:bg-gray-50 hover:border hover:border-gray-200"
-                  )}
-                  title={item.label}
-                >
-                  <Icon className={cn(
-                    "w-6 h-6 transition-all duration-200",
-                    isActiveItem 
-                      ? "text-purple-600 filter drop-shadow-sm"
-                      : "text-gray-500 group-hover:text-purple-600 group-hover:filter group-hover:drop-shadow-sm"
-                  )} />
-                  
-                  {/* Enhanced Tooltip */}
-                  <div className="absolute left-full ml-3 px-3 py-2 bg-white text-gray-900 text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-200 shadow-lg">
-                    {item.label}
-                    <div className="absolute top-1/2 left-0 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-white transform -translate-y-1/2 -translate-x-full"></div>
-                  </div>
-                </Link>
-              );
-            })}
+            {/* Settings */}
+            <Link
+              href="/provider/settings"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-500 hover:text-purple-600 hover:bg-gray-50 transition-all duration-200 group relative"
+              title="Settings"
+            >
+              <Cog6ToothIcon className="w-6 h-6 group-hover:filter group-hover:drop-shadow-sm" />
+              <div className="absolute left-full ml-3 px-3 py-2 bg-white text-gray-900 text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-200 shadow-lg">
+                Settings
+                <div className="absolute top-1/2 left-0 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-white transform -translate-y-1/2 -translate-x-full"></div>
+              </div>
+            </Link>
+
+            {/* Help */}
+            <Link
+              href="/provider/help"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-500 hover:text-purple-600 hover:bg-gray-50 transition-all duration-200 group relative"
+              title="Help"
+            >
+              <QuestionMarkCircleIcon className="w-6 h-6 group-hover:filter group-hover:drop-shadow-sm" />
+              <div className="absolute left-full ml-3 px-3 py-2 bg-white text-gray-900 text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-200 shadow-lg">
+                Help & Support
+                <div className="absolute top-1/2 left-0 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-white transform -translate-y-1/2 -translate-x-full"></div>
+              </div>
+            </Link>
 
             {/* User Profile */}
             <button
@@ -297,7 +224,7 @@ export default function GlobalSidebar({ className }: GlobalSidebarProps) {
               title={`${user.full_name} - Sign out`}
             >
               <span className="text-sm font-medium text-white">
-                {user.full_name?.charAt(0) || 'U'}
+                {user.full_name?.charAt(0) || 'D'}
               </span>
               <div className="absolute left-full ml-3 px-3 py-2 bg-white text-gray-900 text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-200 shadow-lg">
                 Sign out
