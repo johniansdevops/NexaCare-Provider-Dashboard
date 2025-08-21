@@ -18,8 +18,15 @@ import {
   MapPinIcon,
   ChevronRightIcon,
   PlusIcon,
+  HeartIcon,
+  BeakerIcon,
+  DocumentTextIcon,
+  SparklesIcon,
+  BoltIcon,
+  FireIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
-import { formatTime, formatDateTime } from '@/lib/utils';
+import { formatDateTime, cn } from '@/lib/utils';
 
 interface Appointment {
   id: string;
@@ -31,6 +38,7 @@ interface Appointment {
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
   priority: 'normal' | 'urgent';
   duration: number;
+  avatar: string;
 }
 
 interface PatientAlert {
@@ -49,6 +57,17 @@ interface PracticeMetric {
   change: number;
   trend: 'up' | 'down' | 'stable';
   color: string;
+  unit?: string;
+}
+
+interface QuickAction {
+  title: string;
+  description: string;
+  href: string;
+  icon: any;
+  color: string;
+  gradient?: boolean;
+  isAI?: boolean;
 }
 
 export default function ProviderDashboard() {
@@ -62,56 +81,49 @@ export default function ProviderDashboard() {
       id: '1',
       patientName: 'Sarah Johnson',
       patientId: 'PT001',
-      time: '09:00',
+      time: '2024-01-15T09:00:00',
       type: 'in_person',
-      reason: 'Annual Physical',
+      reason: 'Annual Physical Examination',
       status: 'completed',
       priority: 'normal',
-      duration: 30
+      duration: 30,
+      avatar: '👩‍💼'
     },
     {
       id: '2',
       patientName: 'Michael Chen',
       patientId: 'PT002',
-      time: '10:30',
+      time: '2024-01-15T10:30:00',
       type: 'telehealth',
       reason: 'Follow-up Consultation',
       status: 'in_progress',
       priority: 'normal',
-      duration: 20
+      duration: 20,
+      avatar: '👨‍💻'
     },
     {
       id: '3',
       patientName: 'Emily Rodriguez',
       patientId: 'PT003',
-      time: '11:00',
+      time: '2024-01-15T11:00:00',
       type: 'in_person',
       reason: 'Chest Pain Evaluation',
       status: 'scheduled',
       priority: 'urgent',
-      duration: 45
+      duration: 45,
+      avatar: '👩‍🎨'
     },
     {
       id: '4',
       patientName: 'David Park',
       patientId: 'PT004',
-      time: '14:00',
+      time: '2024-01-15T14:00:00',
       type: 'phone',
       reason: 'Lab Results Discussion',
       status: 'scheduled',
       priority: 'normal',
-      duration: 15
-    },
-    {
-      id: '5',
-      patientName: 'Lisa Thompson',
-      patientId: 'PT005',
-      time: '15:30',
-      type: 'telehealth',
-      reason: 'Diabetes Management',
-      status: 'scheduled',
-      priority: 'normal',
-      duration: 30
+      duration: 15,
+      avatar: '👨‍🔬'
     },
   ];
 
@@ -139,7 +151,7 @@ export default function ProviderDashboard() {
       patientName: 'James Anderson',
       patientId: 'PT008',
       type: 'followup',
-      message: 'Overdue for post-surgery follow-up (scheduled 2 weeks ago)',
+      message: 'Overdue for post-surgery follow-up',
       urgency: 'medium',
       time: '1 day ago'
     },
@@ -155,47 +167,88 @@ export default function ProviderDashboard() {
   ];
 
   const practiceMetrics: PracticeMetric[] = [
-    { label: 'Patients Today', value: '12', change: 2, trend: 'up', color: 'text-blue-400' },
-    { label: 'Avg Wait Time', value: '8 min', change: -3, trend: 'down', color: 'text-green-400' },
-    { label: 'Satisfaction', value: '4.8/5', change: 0.2, trend: 'up', color: 'text-purple-400' },
-    { label: 'Revenue Today', value: '$2,840', change: 320, trend: 'up', color: 'text-green-400' },
+    { label: 'Patients Today', value: '18', change: 3, trend: 'up', color: 'text-blue-600' },
+    { label: 'Avg Wait Time', value: '12', change: -2, trend: 'down', color: 'text-green-600', unit: 'min' },
+    { label: 'Satisfaction Score', value: '4.8', change: 0.2, trend: 'up', color: 'text-purple-600', unit: '/5.0' },
+    { label: "Today's Revenue", value: '$3,240', change: 15, trend: 'up', color: 'text-green-600' },
   ];
 
   const aiInsights = [
     {
       id: '1',
       title: 'High-Risk Patient Alert',
-      message: 'Patient Emily Rodriguez shows elevated cardiac markers. Consider ECG and troponin levels.',
+      message: 'Emily Rodriguez shows elevated cardiac markers. Consider immediate ECG and troponin levels for comprehensive evaluation.',
       priority: 'high',
       patientId: 'PT003',
-      time: '30 minutes ago'
+      time: '30 minutes ago',
+      confidence: 94
     },
     {
       id: '2',
-      title: 'Medication Interaction Warning',
-      message: 'Michael Chen: Potential interaction between prescribed Warfarin and new Amoxicillin.',
+      title: 'Drug Interaction Warning',
+      message: 'Potential interaction detected between prescribed Warfarin and new Amoxicillin for Michael Chen.',
       priority: 'medium',
       patientId: 'PT002',
-      time: '1 hour ago'
+      time: '1 hour ago',
+      confidence: 87
     },
     {
       id: '3',
-      title: 'Care Gap Identified',
-      message: '15 patients are due for annual mammograms. Consider scheduling reminders.',
+      title: 'Preventive Care Opportunity',
+      message: '12 patients are due for annual mammograms. Automated reminders can improve compliance rates.',
       priority: 'low',
       patientId: null,
-      time: '2 hours ago'
+      time: '2 hours ago',
+      confidence: 92
+    },
+  ];
+
+  const quickActions: QuickAction[] = [
+    {
+      title: 'AI Clinical Assistant',
+      description: '24/7 clinical decision support',
+      href: '/provider/ai-chat',
+      icon: '✦',
+      color: 'mediva-gradient',
+      gradient: true,
+      isAI: true
+    },
+    {
+      title: 'Patient Management',
+      description: 'View and manage patient records',
+      href: '/provider/patients',
+      icon: UserGroupIcon,
+      color: 'bg-blue-500/20 border border-blue-500/30'
+    },
+    {
+      title: 'Schedule Appointment',
+      description: 'Add new patient appointment',
+      href: '/provider/calendar',
+      icon: CalendarIcon,
+      color: 'bg-green-500/20 border border-green-500/30'
+    },
+    {
+      title: 'Clinical Notes',
+      description: 'Document patient encounters',
+      href: '/provider/notes',
+      icon: ClipboardDocumentListIcon,
+      color: 'bg-purple-500/20 border border-purple-500/30'
+    },
+    {
+      title: 'Practice Analytics',
+      description: 'Review performance insights',
+      href: '/provider/analytics',
+      icon: ChartBarIcon,
+      color: 'bg-orange-500/20 border border-orange-500/30'
     },
   ];
 
   useEffect(() => {
-    // Update current time every minute
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
 
-    // Simulate loading
-    setTimeout(() => setLoading(false), 1000);
+    setTimeout(() => setLoading(false), 1200);
 
     return () => clearInterval(timer);
   }, []);
@@ -214,39 +267,39 @@ export default function ProviderDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'white-badge-success';
+        return 'badge-success';
       case 'in_progress':
-        return 'white-badge-info';
+        return 'badge-info';
       case 'scheduled':
-        return 'white-badge-neutral';
+        return 'badge-neutral';
       case 'cancelled':
-        return 'white-badge-danger';
+        return 'badge-error';
       default:
-        return 'white-badge-neutral';
+        return 'badge-neutral';
     }
   };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'critical':
-        return 'border-red-300';
+        return 'border-red-400 bg-red-50';
       case 'high':
-        return 'border-orange-300';
+        return 'border-orange-400 bg-orange-50';
       case 'medium':
-        return 'border-yellow-300';
+        return 'border-yellow-400 bg-yellow-50';
       default:
-        return 'border-blue-300';
+        return 'border-blue-400 bg-blue-50';
     }
   };
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-white min-h-screen animate-fade-in">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-800/50 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-gray-800/30 rounded-xl"></div>
+              <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
             ))}
           </div>
         </div>
@@ -255,102 +308,131 @@ export default function ProviderDashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 bg-white min-h-screen">
       {/* Welcome Header */}
-      <div className="content-container mb-8">
-        <h1 className="white-heading-large mb-2">
-          Good {currentTime.getHours() < 12 ? 'morning' : currentTime.getHours() < 17 ? 'afternoon' : 'evening'}, Dr. {user?.full_name?.split(' ')[1] || 'Smith'} 👩‍⚕️
-        </h1>
-        <p className="white-body-text">
-          Today is {currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
-        <div className="mt-2 text-sm white-mono-text">
-          Provider Portal • Dashboard Overview
+      <div className="mb-8 animate-slide-up">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+              Good {currentTime.getHours() < 12 ? 'morning' : currentTime.getHours() < 17 ? 'afternoon' : 'evening'}, <span className="gradient-text">Dr. {user?.full_name?.split(' ')[1] || 'Smith'}</span>! 👩‍⚕️
+            </h1>
+            <p className="text-lg text-gray-600">
+              Your practice overview for {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link href="/provider/ai-chat" className="btn-primary">
+              <SparklesIcon className="w-5 h-5 mr-2" />
+              AI Assistant
+            </Link>
+          </div>
+        </div>
+        <div className="text-sm text-gray-500 font-mono">
+          Provider Portal • Clinical Dashboard • Last updated: {new Date().toLocaleTimeString()}
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Practice Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
         {practiceMetrics.map((metric) => (
-          <div key={metric.label} className="white-card p-4">
-            <div className="flex items-center justify-between">
+          <div key={metric.label} className="card-white p-6">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm text-gray-500 white-mono-text">{metric.label}</p>
-                <p className={`text-2xl font-bold ${metric.color}`}>{metric.value}</p>
+                <p className="text-sm text-gray-500 font-mono">{metric.label}</p>
+                <div className="flex items-baseline space-x-1">
+                  <p className={`text-3xl font-bold ${metric.color}`}>{metric.value}</p>
+                  {metric.unit && <span className="text-sm text-gray-500">{metric.unit}</span>}
+                </div>
               </div>
-              <div className="flex items-center text-sm">
-                {metric.trend === 'up' ? (
-                  <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
-                ) : metric.trend === 'down' ? (
-                  <ArrowTrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
-                ) : null}
-                <span className={metric.trend === 'up' ? 'text-green-500' : metric.trend === 'down' ? 'text-red-500' : 'text-gray-500'}>
-                  {metric.change > 0 ? '+' : ''}{metric.change}
-                </span>
-              </div>
+            </div>
+            <div className="flex items-center text-sm">
+              {metric.trend === 'up' ? (
+                <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
+              ) : metric.trend === 'down' ? (
+                <ArrowTrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
+              ) : null}
+              <span className={metric.trend === 'up' ? 'text-green-600' : metric.trend === 'down' ? 'text-red-600' : 'text-gray-500'}>
+                {metric.change > 0 ? '+' : ''}{metric.change} vs yesterday
+              </span>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Today's Appointments */}
-        <div className="xl:col-span-2 white-card p-6">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
+        {quickActions.slice(0, 4).map((action) => (
+          <Link
+            key={action.title}
+            href={action.href}
+            className="card-white-interactive p-6 text-center group"
+          >
+            {typeof action.icon === 'string' ? (
+              <div className="flex items-center justify-center mb-4">
+                <span className="text-4xl text-purple-500 font-bold group-hover:scale-110 transition-transform duration-200">
+                  {action.icon}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center mb-4">
+                <action.icon className="w-8 h-8 text-purple-500 group-hover:scale-110 transition-transform duration-200" />
+              </div>
+            )}
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h4>
+            <p className="text-sm text-gray-600">{action.description}</p>
+          </Link>
+        ))}
+      </div>
+
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Today's Schedule */}
+        <div className="xl:col-span-2 card-white p-6 animate-slide-up">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Today's Schedule</h3>
-            <div className="flex items-center space-x-2">
-              <Link
-                href="/provider/calendar"
-                className="btn-outline text-sm px-3 py-1"
-              >
-                View Calendar
-              </Link>
-              <button className="btn-primary text-sm px-3 py-1">
-                <PlusIcon className="w-4 h-4 mr-1" />
-                Add
-              </button>
+            <div className="flex items-center space-x-3">
+              <CalendarIcon className="w-6 h-6 text-blue-500" />
+              <h3 className="text-xl font-semibold text-gray-900">Today's Schedule</h3>
             </div>
+            <Link href="/provider/calendar" className="text-pink-500 hover:text-pink-600 text-sm font-medium">
+              View calendar →
+            </Link>
           </div>
-          <div className="space-y-3">
+          
+          <div className="space-y-4">
             {todayAppointments.map((appointment) => {
               const Icon = getAppointmentIcon(appointment.type);
               return (
-                <div
-                  key={appointment.id}
-                  className={`p-4 rounded-xl border-l-4 bg-gray-50 ${
-                    appointment.priority === 'urgent' ? 'border-red-500 bg-red-50' : 'border-blue-500'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-lg font-mono text-gray-900">
-                        {appointment.time}
-                      </div>
-                      <div className="w-px h-12 bg-gray-300"></div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-medium text-gray-900">{appointment.patientName}</h4>
-                          <span className="text-xs text-gray-500 white-mono-text">({appointment.patientId})</span>
+                <div key={appointment.id} className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-3">
+                      <div className="text-2xl">{appointment.avatar}</div>
+                      <div>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <p className="font-semibold text-gray-900">{appointment.patientName}</p>
+                          <span className="text-xs text-gray-500 font-mono">({appointment.patientId})</span>
                           {appointment.priority === 'urgent' && (
-                            <ExclamationTriangleIcon className="w-4 h-4 icon-gradient-red" />
+                            <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1 white-body-text">{appointment.reason}</p>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <Icon className="w-4 h-4 icon-gradient-blue" />
-                          <span className="text-xs text-gray-500 capitalize white-mono-text">{appointment.type.replace('_', ' ')}</span>
-                          <span className="text-xs text-gray-500 white-mono-text">• {appointment.duration} min</span>
+                        <p className="text-sm text-gray-600 mb-2">{appointment.reason}</p>
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
+                          <span className="font-mono">{formatDateTime(appointment.time)}</span>
+                          <div className="flex items-center space-x-1">
+                            <Icon className="w-3 h-3" />
+                            <span className="capitalize">{appointment.type.replace('_', ' ')}</span>
+                          </div>
+                          <span>{appointment.duration} min</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(appointment.status)}`}>
-                        {appointment.status.replace('_', ' ')}
-                      </span>
-                      <button className="text-gray-500 hover:text-gray-900">
-                        <ChevronRightIcon className="w-5 h-5" />
-                      </button>
-                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(appointment.status)}`}>
+                      {appointment.status.replace('_', ' ')}
+                    </span>
                   </div>
                 </div>
               );
@@ -359,33 +441,35 @@ export default function ProviderDashboard() {
         </div>
 
         {/* Patient Alerts */}
-        <div className="white-card p-6">
+        <div className="card-white p-6 animate-slide-up">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Patient Alerts</h3>
-            <Link href="/provider/patients" className="text-pink-400 hover:text-pink-300 text-sm">
-              View All
+            <div className="flex items-center space-x-3">
+              <ExclamationTriangleIcon className="w-6 h-6 text-orange-500" />
+              <h3 className="text-xl font-semibold text-gray-900">Patient Alerts</h3>
+            </div>
+            <Link href="/provider/patients" className="text-pink-500 hover:text-pink-600 text-sm font-medium">
+              View all →
             </Link>
           </div>
-          <div className="space-y-3">
+          
+          <div className="space-y-4">
             {patientAlerts.slice(0, 4).map((alert) => (
               <div
                 key={alert.id}
-                className={`p-3 rounded-xl border-l-4 bg-gray-50 ${getUrgencyColor(alert.urgency)}`}
+                className={`p-4 rounded-xl border-l-4 transition-colors hover:bg-gray-50 ${getUrgencyColor(alert.urgency)}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h4 className="font-medium text-gray-900 text-sm">{alert.patientName}</h4>
-                      <span className="text-xs text-gray-500 white-mono-text">({alert.patientId})</span>
+                      <p className="font-semibold text-gray-900 text-sm">{alert.patientName}</p>
+                      <span className="text-xs text-gray-500 font-mono">({alert.patientId})</span>
+                      {alert.urgency === 'critical' && (
+                        <span className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">URGENT</span>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700 mb-2 white-body-text">{alert.message}</p>
-                    <p className="text-xs text-gray-500 white-mono-text">{alert.time}</p>
+                    <p className="text-sm text-gray-700 mb-2 leading-relaxed">{alert.message}</p>
+                    <p className="text-xs text-gray-500 font-mono">{alert.time}</p>
                   </div>
-                  <div className={`w-2 h-2 rounded-full ${
-                    alert.urgency === 'critical' ? 'bg-gradient-to-r from-red-400 to-red-600' :
-                    alert.urgency === 'high' ? 'bg-gradient-to-r from-orange-400 to-red-500' :
-                    alert.urgency === 'medium' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' : 'bg-gradient-to-r from-blue-400 to-blue-600'
-                  }`}></div>
                 </div>
               </div>
             ))}
@@ -394,44 +478,40 @@ export default function ProviderDashboard() {
       </div>
 
       {/* AI Clinical Insights */}
-      <div className="white-card p-6">
+      <div className="card-white p-6 animate-slide-up">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <span className="text-xl ai-text font-bold">✦</span>
-            <h3 className="text-xl font-semibold text-gray-900">AI Clinical Insights</h3>
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 mediva-gradient rounded-2xl flex items-center justify-center ai-glow">
+              <span className="text-white font-bold text-lg">✦</span>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">AI Clinical Insights</h3>
+              <p className="text-xs text-gray-500 font-mono">Powered by advanced clinical analytics</p>
+            </div>
           </div>
-          <Link href="/provider/ai-chat" className="text-pink-400 hover:text-pink-300 text-sm">
+          <Link href="/provider/ai-chat" className="btn-primary">
+            <BoltIcon className="w-4 h-4 mr-2" />
             Open AI Assistant
           </Link>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {aiInsights.map((insight) => (
-            <div
-              key={insight.id}
-              className={`p-4 rounded-xl border bg-gray-50 ${
-                insight.priority === 'high' ? 'border-red-300 bg-red-50' :
-                insight.priority === 'medium' ? 'border-yellow-300 bg-yellow-50' :
-                'border-blue-300'
-              }`}
-            >
-              <div className="flex items-start space-x-3">
-                <div className={`w-2 h-2 rounded-full mt-2 ${
-                  insight.priority === 'high' ? 'bg-gradient-to-r from-red-400 to-red-600' :
-                  insight.priority === 'medium' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' : 'bg-gradient-to-r from-blue-400 to-blue-600'
+            <div key={insight.id} className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+              <div className="flex items-start space-x-3 mb-3">
+                <div className={`w-3 h-3 rounded-full mt-2 ${
+                  insight.priority === 'high' ? 'bg-red-400' : 
+                  insight.priority === 'medium' ? 'bg-yellow-400' : 
+                  'bg-blue-400'
                 }`}></div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-2">{insight.title}</h4>
-                  <p className="text-sm text-gray-700 mb-3 white-body-text">{insight.message}</p>
+                  <h4 className="font-semibold text-gray-900 mb-2">{insight.title}</h4>
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">{insight.message}</p>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500 white-mono-text">{insight.time}</p>
-                    {insight.patientId && (
-                      <Link
-                        href={`/provider/patients/${insight.patientId}`}
-                        className="text-xs text-pink-400 hover:text-pink-300"
-                      >
-                        View Patient →
-                      </Link>
-                    )}
+                    <p className="text-xs text-gray-500 font-mono">{insight.time}</p>
+                    <span className="text-xs text-green-600 font-mono">
+                      {insight.confidence}% confidence
+                    </span>
                   </div>
                 </div>
               </div>
@@ -440,33 +520,40 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link href="/provider/patients" className="white-card p-4 white-card-hover">
-          <UserGroupIcon className="w-8 h-8 icon-gradient-blue mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-1">Manage Patients</h4>
-          <p className="text-sm white-body-text">View and update patient records</p>
-        </Link>
-        
-        <Link href="/provider/ai-chat" className="white-card p-4 white-card-hover">
-          <div className="w-8 h-8 mb-3 flex items-center justify-center">
-            <span className="text-2xl icon-gradient-ai font-bold">✦</span>
+      {/* Additional Quick Action */}
+      <div className="card-white p-6 animate-slide-up">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <HeartIcon className="w-6 h-6 text-purple-500" />
+            <h3 className="text-xl font-semibold text-gray-900">More Actions</h3>
           </div>
-          <h4 className="font-semibold text-gray-900 mb-1">AI Assistant</h4>
-          <p className="text-sm white-body-text">Clinical decision support</p>
-        </Link>
+        </div>
         
-        <Link href="/provider/analytics" className="white-card p-4 white-card-hover">
-          <ChartBarIcon className="w-8 h-8 icon-gradient-green mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-1">Practice Analytics</h4>
-          <p className="text-sm white-body-text">Review performance metrics</p>
-        </Link>
-        
-        <button className="white-card p-4 white-card-hover text-left">
-          <ClipboardDocumentListIcon className="w-8 h-8 icon-gradient-purple mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-1">Add Notes</h4>
-          <p className="text-sm white-body-text">Quick patient documentation</p>
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/provider/real-time-monitoring" className="p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors group">
+            <HeartIcon className="w-6 h-6 text-red-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h4 className="font-semibold text-gray-900 text-sm">Patient Monitoring</h4>
+            <p className="text-xs text-gray-600">Real-time vitals</p>
+          </Link>
+          
+          <Link href="/provider/clinical-decision-support" className="p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group">
+            <BeakerIcon className="w-6 h-6 text-green-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h4 className="font-semibold text-gray-900 text-sm">Clinical Support</h4>
+            <p className="text-xs text-gray-600">Decision tools</p>
+          </Link>
+          
+          <Link href="/provider/documents" className="p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group">
+            <DocumentTextIcon className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h4 className="font-semibold text-gray-900 text-sm">Documents</h4>
+            <p className="text-xs text-gray-600">Medical records</p>
+          </Link>
+          
+          <button className="p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group text-left">
+            <PlusIcon className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h4 className="font-semibold text-gray-900 text-sm">Add Patient</h4>
+            <p className="text-xs text-gray-600">Register new</p>
+          </button>
+        </div>
       </div>
     </div>
   );
